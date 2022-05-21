@@ -1,5 +1,9 @@
+import MoviePage from '../MoviePage/MoviePage';
+
 function App(): JSX.Element {
-  return <p>Hello, world!</p>;
+  return (
+    <MoviePage />
+  );
 }
 
 export default App;
