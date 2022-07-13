@@ -6,8 +6,18 @@ import MyList from '../MyList/MyList';
 import NotFound from '../NotFound/NotFound';
 import Player from '../Player/Player';
 import SignIn from '../SignIn/SignIn';
+import { useAppDispatch } from '../../hooks/useApps';
+import { useEffect } from 'react';
+import { fetchFilms } from '../../store/filmSlice';
 
 function App(): JSX.Element {
+
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(fetchFilms(''));
+  }, []);
+
   return (
     <Routes>
       <Route path="/" element={<Main />} />
