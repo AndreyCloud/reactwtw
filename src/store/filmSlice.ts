@@ -1,14 +1,16 @@
 import { AnyAction, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ArrFilms } from '../types/films';
+import { ArrFilms, Film } from '../types/films';
 
 type FilmsState = {
   films: ArrFilms;
+  promoFilm: Film;
   error: string | null;
   loading: boolean;
 }
 
 const initialState: FilmsState = {
   films: [],
+  promoFilm: {} as Film,
   error: null,
   loading: false,
 };
@@ -17,6 +19,19 @@ export const fetchFilms = createAsyncThunk<ArrFilms, unknown, {rejectValue: stri
   'films/fetchFilms',
   async (_, {rejectWithValue}) => {
     const respons = await fetch('https://8.react.pages.academy/wtw/films');
+
+    if(!respons.ok) {
+      return rejectWithValue('Server error!');
+    }
+
+    const data = await respons.json();
+    return data;
+  },
+);
+export const fetchFilmPromo = createAsyncThunk<Film, unknown, {rejectValue: string}>(
+  'films/fetchFilmPromo',
+  async (_, {rejectWithValue}) => {
+    const respons = await fetch('https://8.react.pages.academy/wtw/promo');
 
     if(!respons.ok) {
       return rejectWithValue('Server error!');
@@ -40,6 +55,15 @@ const filmSlice = createSlice({
       })
       .addCase(fetchFilms.fulfilled, (state, action) => {
         state.films = action.payload;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(fetchFilmPromo.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchFilmPromo.fulfilled, (state, action) => {
+        state.promoFilm = action.payload;
         state.loading = false;
         state.error = null;
       })

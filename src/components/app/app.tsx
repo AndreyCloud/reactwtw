@@ -8,7 +8,7 @@ import Player from '../Player/Player';
 import SignIn from '../SignIn/SignIn';
 import { useAppDispatch } from '../../hooks/useApps';
 import { useEffect } from 'react';
-import { fetchFilms } from '../../store/filmSlice';
+import { fetchFilmPromo, fetchFilms } from '../../store/filmSlice';
 
 function App(): JSX.Element {
 
@@ -16,6 +16,7 @@ function App(): JSX.Element {
 
   useEffect(() => {
     dispatch(fetchFilms(''));
+    dispatch(fetchFilmPromo(''));
   }, []);
 
   return (
