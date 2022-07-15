@@ -6,10 +6,26 @@ import GenreList from '../GenreList/CenreList';
 
 export default function Main(): JSX.Element {
 
-  const films = useAppSelector((state) => state.film.films);
+  const filmsNoSort = useAppSelector((state) => state.film.films);
   const promoFilm = useAppSelector((state) => state.film.promoFilm);
 
   const [showFilms, setShowFilms] = useState(8);
+  const [sort, setSort] = useState('All genres');
+
+  const films = FilmsSort(filmsNoSort, sort);
+
+  function FilmsSort (arrFilms: ArrFilms, sorted: string): ArrFilms {
+    if(sort !== 'All genres') {
+      return arrFilms.filter((v) => v.genre === sort);
+    } else {
+      return arrFilms;
+    }
+  }
+
+  function SortGenre (genre: string) {
+    setSort(genre);
+    setShowFilms(8);
+  }
 
   const filmsShow = films.slice(0, showFilms);
 
@@ -21,7 +37,7 @@ export default function Main(): JSX.Element {
     return Array.from(new Set(uniq));
   }
 
-  const genres = Unique(films);
+  const genres = Unique(filmsNoSort).slice(0, 9);
 
   const ChangeFilmsList = () => {
     setShowFilms(showFilms + 8);
@@ -32,8 +48,8 @@ export default function Main(): JSX.Element {
       <section className="film-card">
         <div className="film-card__bg">
           <img
-            src="img/bg-the-grand-budapest-hotel.jpg"
-            alt="The Grand Budapest Hotel"
+            src={promoFilm.background_image}
+            alt={promoFilm.name}
           />
         </div>
 
@@ -111,14 +127,14 @@ export default function Main(): JSX.Element {
       <div className="page-content">
         <section className="catalog">
           <h2 className="catalog__title visually-hidden">Catalog</h2>
-          <GenreList genres={genres}/>
+          <GenreList genres={genres} sort={sort} sortGenre={SortGenre}/>
           <div className="catalog__films-list">
             {filmsShow.map((film) =>
               <CardFilm key={film.id} film={film}/>,
             )}
           </div>
 
-          {showFilms <= films.length &&
+          {showFilms < films.length &&
           <div className="catalog__more">
             <button onClick={ChangeFilmsList} className="catalog__button" type="button">
               Show more
