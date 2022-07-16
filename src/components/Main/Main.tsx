@@ -1,47 +1,9 @@
-import { useState } from 'react';
 import { useAppSelector } from '../../hooks/useApps';
-import { ArrFilms } from '../../types/films';
-import CardFilm from '../CardFilm/CardFilm';
-import GenreList from '../GenreList/CenreList';
+import Catalog from '../Catalog/Catalog';
 
 export default function Main(): JSX.Element {
 
-  const filmsNoSort = useAppSelector((state) => state.film.films);
   const promoFilm = useAppSelector((state) => state.film.promoFilm);
-
-  const [showFilms, setShowFilms] = useState(8);
-  const [sort, setSort] = useState('All genres');
-
-  const films = FilmsSort(filmsNoSort, sort);
-
-  function FilmsSort (arrFilms: ArrFilms, sorted: string): ArrFilms {
-    if(sort !== 'All genres') {
-      return arrFilms.filter((v) => v.genre === sort);
-    } else {
-      return arrFilms;
-    }
-  }
-
-  function SortGenre (genre: string) {
-    setSort(genre);
-    setShowFilms(8);
-  }
-
-  const filmsShow = films.slice(0, showFilms);
-
-  function Unique(arr: ArrFilms) {
-    const uniq: string[] = [];
-    arr.forEach((element) => {
-      uniq.push(element.genre);
-    });
-    return Array.from(new Set(uniq));
-  }
-
-  const genres = Unique(filmsNoSort).slice(0, 9);
-
-  const ChangeFilmsList = () => {
-    setShowFilms(showFilms + 8);
-  };
 
   return (
     <>
@@ -125,24 +87,7 @@ export default function Main(): JSX.Element {
       </section>
 
       <div className="page-content">
-        <section className="catalog">
-          <h2 className="catalog__title visually-hidden">Catalog</h2>
-          <GenreList genres={genres} sort={sort} sortGenre={SortGenre}/>
-          <div className="catalog__films-list">
-            {filmsShow.map((film) =>
-              <CardFilm key={film.id} film={film}/>,
-            )}
-          </div>
-
-          {showFilms < films.length &&
-          <div className="catalog__more">
-            <button onClick={ChangeFilmsList} className="catalog__button" type="button">
-              Show more
-            </button>
-          </div>}
-
-        </section>
-
+        <Catalog/>
         <footer className="page-footer">
           <div className="logo">
             <a className="logo__link logo__link--light">
