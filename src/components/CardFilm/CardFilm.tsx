@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Film } from '../../types/films';
 
 type CardFilmProps = {
@@ -11,6 +12,7 @@ function CardFilm({film}: CardFilmProps): JSX.Element {
 
   const VideoPreview = (vlink: string) => setIdPreview(vlink);
   const CardOut = () => setIdPreview('');
+  const pathId = `/films/${film.id}`;
 
   const vueCard = idPreview !== '' ?(
     <video
@@ -33,13 +35,15 @@ function CardFilm({film}: CardFilmProps): JSX.Element {
       onMouseLeave={() => CardOut()}
       className="small-film-card catalog__films-card"
     >
-      <div className="small-film-card__image">
-        {vueCard}
-      </div>
+      <Link to={pathId}>
+        <div className="small-film-card__image">
+          {vueCard}
+        </div>
+      </Link>
       <h3 className="small-film-card__title">
-        <a className="small-film-card__link" href="film-page.html">
+        <Link to={pathId} className="small-film-card__link" >
           {film.name}
-        </a>
+        </Link>
       </h3>
     </article>
   );
