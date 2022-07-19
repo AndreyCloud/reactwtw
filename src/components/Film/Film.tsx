@@ -1,10 +1,22 @@
-import { useParams } from 'react-router-dom';
-import { useAppSelector } from '../../hooks/useApps';
+import { useEffect } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../hooks/useApps';
+import { chooseODR, fetchComment, fetchSimilar } from '../../store/filmSlice';
+import CardFilm from '../CardFilm/CardFilm';
+import Reviews from './Reviews';
+import Details from './Details';
+import Overview from './Overview';
 
 function Film(): JSX.Element {
 
+  const odr = ['Overview', 'Details', 'Reviews'];
+  const odrClassActive = 'film-nav__item film-nav__item--active';
+  const odrClass = 'film-nav__item ';
+  const odrItem = useAppSelector((state) => state.film.filmODR);
+
+
   const params = useParams();
-  const idFilm = params.id;
+  const idFilm = params.id ? params.id : '';
 
   const films = useAppSelector((state) => state.film.films);
   const film = films.find((e) => String(e.id) === idFilm);
@@ -26,7 +38,43 @@ function Film(): JSX.Element {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const rating = Rating(film?.rating);
+
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(fetchSimilar(idFilm));
+    dispatch(fetchComment(idFilm));
+    smoothscroll();
+  }, [idFilm]);
+
+  const similar = useAppSelector((state) => state.film.similar);
+
+  function smoothscroll(){
+    const currentScroll = document.documentElement.scrollTop || document.body.scrollTop;
+    if (currentScroll > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      window.requestAnimationFrame(smoothscroll);
+      window.scrollTo (0,currentScroll - (currentScroll/25));
+    }
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  function SortODR(e: { preventDefault: () => void; }, item: string) {
+    e.preventDefault();
+    dispatch(chooseODR(item));
+  }
+  function VueODR (vue: string) {
+    switch(vue) {
+      case 'Overview':
+        return (<Overview film={film} rating={rating}/>);
+      case 'Details':
+        return (<Details film={film} />);
+      case 'Reviews':
+        return (<Reviews/>);
+    }
+  }
+  const vueODR = VueODR(odrItem);
 
   return (
     <>
@@ -43,11 +91,11 @@ function Film(): JSX.Element {
 
           <header className="page-header film-card__head">
             <div className="logo">
-              <a href="main.html" className="logo__link">
+              <Link to='/' className="logo__link">
                 <span className="logo__letter logo__letter--1">W</span>
                 <span className="logo__letter logo__letter--2">T</span>
                 <span className="logo__letter logo__letter--3">W</span>
-              </a>
+              </Link>
             </div>
 
             <ul className="user-block">
@@ -116,44 +164,18 @@ function Film(): JSX.Element {
             <div className="film-card__desc">
               <nav className="film-nav film-card__nav">
                 <ul className="film-nav__list">
-                  <li className="film-nav__item film-nav__item--active">
-                    <a href="#" className="film-nav__link">
-                      Overview
-                    </a>
-                  </li>
-                  <li className="film-nav__item">
-                    <a href="#" className="film-nav__link">
-                      Details
-                    </a>
-                  </li>
-                  <li className="film-nav__item">
-                    <a href="#" className="film-nav__link">
-                      Reviews
-                    </a>
-                  </li>
+                  {odr.map((el) =>
+                    (
+                      <li onClick={(e) => SortODR(e, el)} key={el} className={odrItem === el ? odrClassActive : odrClass}>
+                        <a href="#" className="film-nav__link">
+                          {el}
+                        </a>
+                      </li>
+                    ),
+                  )}
                 </ul>
               </nav>
-
-              <div className="film-rating">
-                <div className="film-rating__score">{film?.rating}</div>
-                <p className="film-rating__meta">
-                  <span className="film-rating__level">{rating}</span>
-                  <span className="film-rating__count">{film?.scores_count} ratings</span>
-                </p>
-              </div>
-
-              <div className="film-card__text">
-                {film?.description}
-                <p className="film-card__director">
-                  <strong>Director: {film?.director}</strong>
-                </p>
-
-                <p className="film-card__starring">
-                  <strong>
-                    Starring: {film?.starring.join(', ')}
-                  </strong>
-                </p>
-              </div>
+              {vueODR}
             </div>
           </div>
         </div>
@@ -164,69 +186,9 @@ function Film(): JSX.Element {
           <h2 className="catalog__title">More like this</h2>
 
           <div className="catalog__films-list">
-            <article className="small-film-card catalog__films-card">
-              <div className="small-film-card__image">
-                <img
-                  src="img/fantastic-beasts-the-crimes-of-grindelwald.jpg"
-                  alt="Fantastic Beasts: The Crimes of Grindelwald"
-                  width="280"
-                  height="175"
-                />
-              </div>
-              <h3 className="small-film-card__title">
-                <a className="small-film-card__link" href="film-page.html">
-                  Fantastic Beasts: The Crimes of Grindelwald
-                </a>
-              </h3>
-            </article>
-
-            <article className="small-film-card catalog__films-card">
-              <div className="small-film-card__image">
-                <img
-                  src="img/bohemian-rhapsody.jpg"
-                  alt="Bohemian Rhapsody"
-                  width="280"
-                  height="175"
-                />
-              </div>
-              <h3 className="small-film-card__title">
-                <a className="small-film-card__link" href="film-page.html">
-                  Bohemian Rhapsody
-                </a>
-              </h3>
-            </article>
-
-            <article className="small-film-card catalog__films-card">
-              <div className="small-film-card__image">
-                <img
-                  src="img/macbeth.jpg"
-                  alt="Macbeth"
-                  width="280"
-                  height="175"
-                />
-              </div>
-              <h3 className="small-film-card__title">
-                <a className="small-film-card__link" href="film-page.html">
-                  Macbeth
-                </a>
-              </h3>
-            </article>
-
-            <article className="small-film-card catalog__films-card">
-              <div className="small-film-card__image">
-                <img
-                  src="img/aviator.jpg"
-                  alt="Aviator"
-                  width="280"
-                  height="175"
-                />
-              </div>
-              <h3 className="small-film-card__title">
-                <a className="small-film-card__link" href="film-page.html">
-                  Aviator
-                </a>
-              </h3>
-            </article>
+            {similar.map((sim) =>
+              <CardFilm key={sim.id} film={sim}/>,
+            )}
           </div>
         </section>
 
