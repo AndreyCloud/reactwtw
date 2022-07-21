@@ -6,6 +6,7 @@ import CardFilm from '../CardFilm/CardFilm';
 import Reviews from './Reviews';
 import Details from './Details';
 import Overview from './Overview';
+import UserBlock from '../UserBlock/UserBlock';
 
 function Film(): JSX.Element {
 
@@ -97,22 +98,7 @@ function Film(): JSX.Element {
                 <span className="logo__letter logo__letter--3">W</span>
               </Link>
             </div>
-
-            <ul className="user-block">
-              <li className="user-block__item">
-                <div className="user-block__avatar">
-                  <img
-                    src="img/avatar.jpg"
-                    alt="User avatar"
-                    width="63"
-                    height="63"
-                  />
-                </div>
-              </li>
-              <li className="user-block__item">
-                <a className="user-block__link">Sign out</a>
-              </li>
-            </ul>
+            <UserBlock/>
           </header>
 
           <div className="film-card__wrap">
@@ -194,11 +180,11 @@ function Film(): JSX.Element {
 
         <footer className="page-footer">
           <div className="logo">
-            <a href="main.html" className="logo__link logo__link--light">
+            <Link to='/'  className="logo__link logo__link--light">
               <span className="logo__letter logo__letter--1">W</span>
               <span className="logo__letter logo__letter--2">T</span>
               <span className="logo__letter logo__letter--3">W</span>
-            </a>
+            </Link>
           </div>
 
           <div className="copyright">

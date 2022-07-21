@@ -1,5 +1,6 @@
 import { useAppSelector } from '../../hooks/useApps';
 import Catalog from '../Catalog/Catalog';
+import UserBlock from '../UserBlock/UserBlock';
 
 export default function Main(): JSX.Element {
 
@@ -25,22 +26,7 @@ export default function Main(): JSX.Element {
               <span className="logo__letter logo__letter--3">W</span>
             </a>
           </div>
-
-          <ul className="user-block">
-            <li className="user-block__item">
-              <div className="user-block__avatar">
-                <img
-                  src="img/avatar.jpg"
-                  alt="User avatar"
-                  width="63"
-                  height="63"
-                />
-              </div>
-            </li>
-            <li className="user-block__item">
-              <a className="user-block__link">Sign out</a>
-            </li>
-          </ul>
+          <UserBlock/>
         </header>
 
         <div className="film-card__wrap">
@@ -96,7 +82,6 @@ export default function Main(): JSX.Element {
               <span className="logo__letter logo__letter--3">W</span>
             </a>
           </div>
-
           <div className="copyright">
             <p>© 2019 What to watch Ltd.</p>
           </div>

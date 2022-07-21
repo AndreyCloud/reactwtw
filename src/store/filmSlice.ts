@@ -7,6 +7,7 @@ type FilmsState = {
   promoFilm: Film;
   commentFilm: ArrCommentGet;
   filmODR: string;
+  sortGenre: string;
   error: string | null;
   loading: boolean;
 }
@@ -17,6 +18,7 @@ const initialState: FilmsState = {
   promoFilm: {} as Film,
   commentFilm: [],
   filmODR: 'Overview',
+  sortGenre: 'All genres',
   error: null,
   loading: false,
 };
@@ -82,6 +84,9 @@ const filmSlice = createSlice({
     chooseODR(state, action) {
       state.filmODR = action.payload;
     },
+    sortGenre(state, action) {
+      state.sortGenre = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -134,6 +139,6 @@ function isError (action: AnyAction) {
   return action.type.endsWith('rejected');
 }
 
-export const {chooseODR} = filmSlice.actions;
+export const {chooseODR, sortGenre} = filmSlice.actions;
 
 export default filmSlice.reducer;

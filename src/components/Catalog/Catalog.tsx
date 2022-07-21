@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useAppSelector } from '../../hooks/useApps';
+import { useAppDispatch, useAppSelector } from '../../hooks/useApps';
+import { sortGenre } from '../../store/filmSlice';
 import { ArrFilms } from '../../types/films';
 import CardFilm from '../CardFilm/CardFilm';
 
@@ -7,9 +8,9 @@ import CardFilm from '../CardFilm/CardFilm';
 function Catalog() {
 
   const [showFilms, setShowFilms] = useState(8);
-  const [sort, setSort] = useState('All genres');
 
   const filmsNoSort = useAppSelector((state) => state.film.films);
+  const sort = useAppSelector((state) => state.film.sortGenre);
   const films = FilmsSort(filmsNoSort, sort);
   const filmsShow = films.slice(0, showFilms);
   const genres = Unique(filmsNoSort).slice(0, 9);
@@ -18,6 +19,7 @@ function Catalog() {
   const ChangeFilmsList = () => {
     setShowFilms(showFilms + 8);
   };
+  const dispatch = useAppDispatch();
 
   function FilmsSort (arrFilms: ArrFilms, sorted: string): ArrFilms {
     if(sort !== 'All genres') {
@@ -36,7 +38,7 @@ function Catalog() {
   }
 
   function SortGenre (genre: string) {
-    setSort(genre);
+    dispatch(sortGenre(genre));
     setShowFilms(8);
   }
 

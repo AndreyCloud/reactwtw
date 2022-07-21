@@ -33,3 +33,16 @@ export type CommentGet = {
 }
 
 export type ArrCommentGet = CommentGet[];
+
+export type Login = {
+  email: string,
+password: string
+}
+
+export type User = {
+  id: number,
+email: string,
+name: string,
+avatar_url: string,
+token: string
+}
