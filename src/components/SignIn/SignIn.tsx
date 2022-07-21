@@ -74,7 +74,7 @@ function SignIn(): JSX.Element {
   function sendLogin(e: { preventDefault: () => void; })  {
     e.preventDefault();
     dispatch(fetchLogin(user));
-    if(!error && loading) {
+    if(error === null && loading === false) {
       goMain();
     }
   }

@@ -5,7 +5,7 @@ export const fetchLogin = createAsyncThunk<User, Login, { rejectValue: string }>
   'user/fetchLogin',
   async (user, { rejectWithValue }) => {
 
-    const response = await fetch(' https://8.react.pages.academy/wtw/login', {
+    const response = await fetch('https://8.react.pages.academy/wtw/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -25,8 +25,30 @@ export const fetchLogin = createAsyncThunk<User, Login, { rejectValue: string }>
   },
 );
 
+export const fetchLoginToken = createAsyncThunk<User, string, { rejectValue: string }>(
+  'user/fetchLoginToken',
+  async (token, { rejectWithValue }) => {
+
+    const response = await fetch('https://8.react.pages.academy/wtw/login', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Token': token,
+      },
+    });
+
+    if (!response.ok) {
+      return rejectWithValue('Authorization failed!');
+    }
+
+    const data = await response.json() as User;
+    localStorage.setItem('user', JSON.stringify(data.token));
+
+    return data;
+  },
+);
+
 type UserState = {
-  token: string,
   user: User,
   error: string | null,
   loadingUser: boolean,
@@ -34,7 +56,6 @@ type UserState = {
 
 
 const initialState: UserState = {
-  token: '',
   user: {} as User,
   error: null,
   loadingUser: false,
@@ -43,7 +64,12 @@ const initialState: UserState = {
 const userSlice = createSlice({
   name: 'user',
   initialState,
-  reducers: {},
+  reducers: {
+    userDelete(state){
+      localStorage.removeItem('user');
+      state.user = {} as User;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchLogin.pending, (state) => {
@@ -51,6 +77,13 @@ const userSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchLogin.fulfilled, (state, action) => {
+        state.user = action.payload;
+        state.loadingUser = false;
+      })
+      .addCase(fetchLoginToken.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(fetchLoginToken.fulfilled, (state, action) => {
         state.user = action.payload;
         state.loadingUser = false;
       })
@@ -64,5 +97,7 @@ const userSlice = createSlice({
 function isError(action: AnyAction) {
   return action.type.endsWith('rejected');
 }
+
+export const {userDelete} = userSlice.actions;
 
 export default userSlice.reducer;

@@ -9,14 +9,20 @@ import SignIn from '../SignIn/SignIn';
 import { useAppDispatch } from '../../hooks/useApps';
 import { useEffect } from 'react';
 import { fetchFilmPromo, fetchFilms } from '../../store/filmSlice';
+import { fetchLoginToken } from '../../store/userSlice';
 
 function App(): JSX.Element {
+
+  const tokenLogin = localStorage.getItem('user');
 
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     dispatch(fetchFilms(''));
     dispatch(fetchFilmPromo(''));
+    if(tokenLogin) {
+      dispatch(fetchLoginToken(tokenLogin));
+    }
   }, []);
 
   return (

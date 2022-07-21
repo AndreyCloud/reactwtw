@@ -1,33 +1,40 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useAppSelector } from '../../hooks/useApps';
+import { useAppDispatch, useAppSelector } from '../../hooks/useApps';
+import { userDelete } from '../../store/userSlice';
 
 function UserBlock(): JSX.Element  {
 
 
   const user = useAppSelector((state) => state.user.user);
-  // const token = useAppSelector((state) => state.user.token);
   const token = user.token;
+  const dispatch = useAppDispatch();
 
-  // eslint-disable-next-line no-console
-  console.log(token);
+  const SignOut = () => {
+    dispatch(userDelete());
+  };
 
-  const userBlock = (token !== '') ?
+  const userBlock = (token !== undefined) ?
     (
       <ul className="user-block">
         <li className="user-block__item">
           <div className="user-block__avatar">
-            <img
-              src={user.avatar_url}
-              alt="User avatar"
-              width="63"
-              height="63"
-            />
+            <Link to='/mylist'>
+              <img
+                src={user.avatar_url}
+                alt="User avatar"
+                width="63"
+                height="63"
+              />
+            </Link>
+
           </div>
         </li>
-        <li className="user-block__item">
-          <a className="user-block__link">Sign out</a>
-        </li>
+        <Link to='/'>
+          <li onClick={SignOut} className="user-block__item">
+            <a className="user-block__link">Sign out</a>
+          </li>
+        </Link>
       </ul>
     )
     :
@@ -39,11 +46,7 @@ function UserBlock(): JSX.Element  {
       </ul>
     );
   return (
-    // eslint-disable-next-line react/jsx-no-useless-fragment
-    <>
-      {userBlock}
-    </>
-
+    userBlock
   );
 
 }
