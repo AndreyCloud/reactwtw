@@ -1,10 +1,21 @@
-import { useAppSelector } from '../../hooks/useApps';
+import { useEffect } from 'react';
+import { useAppDispatch, useAppSelector } from '../../hooks/useApps';
+import { fetchFavoriteFilms } from '../../store/filmSlice';
 import Catalog from '../Catalog/Catalog';
 import UserBlock from '../UserBlock/UserBlock';
 
 export default function Main(): JSX.Element {
 
   const promoFilm = useAppSelector((state) => state.film.promoFilm);
+  const token = useAppSelector((state) => state.user.user.token);
+
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (token !== undefined) {
+      dispatch(fetchFavoriteFilms(token));
+    }
+  }, [token]);
 
   return (
     <>

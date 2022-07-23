@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/useApps';
-import { chooseODR, fetchComment, fetchSimilar } from '../../store/filmSlice';
+import { chooseODR, fetchComment, fetchFavoriteFilmsAdd, fetchSimilar } from '../../store/filmSlice';
 import CardFilm from '../CardFilm/CardFilm';
 import Reviews from './Reviews';
 import Details from './Details';
@@ -9,15 +9,16 @@ import Overview from './Overview';
 import UserBlock from '../UserBlock/UserBlock';
 
 function Film(): JSX.Element {
-
   const odr = ['Overview', 'Details', 'Reviews'];
   const odrClassActive = 'film-nav__item film-nav__item--active';
   const odrClass = 'film-nav__item ';
   const odrItem = useAppSelector((state) => state.film.filmODR);
 
-
   const params = useParams();
   const idFilm = params.id ? params.id : '';
+  const token = useAppSelector((state) => state.user.user.token);
+  const id = idFilm;
+  const idToken = {id, token};
 
   const films = useAppSelector((state) => state.film.films);
   const film = films.find((e) => String(e.id) === idFilm);
@@ -26,15 +27,19 @@ function Film(): JSX.Element {
     if (grade === undefined) {
       return '--//--';
     }
-    if(grade < 3 && grade > 0){
+    if (grade < 3 && grade > 0) {
       return 'Bad';
-    } if (3 <= grade && grade < 5) {
+    }
+    if (3 <= grade && grade < 5) {
       return ' Normal';
-    } if (5 <= grade && grade < 8) {
+    }
+    if (5 <= grade && grade < 8) {
       return 'Good';
-    } if (8 <= grade && grade < 10) {
+    }
+    if (8 <= grade && grade < 10) {
       return 'Good';
-    } if (grade === 10) {
+    }
+    if (grade === 10) {
       return 'Awesome';
     }
   };
@@ -52,53 +57,74 @@ function Film(): JSX.Element {
 
   const similar = useAppSelector((state) => state.film.similar);
 
-  function smoothscroll(){
-    const currentScroll = document.documentElement.scrollTop || document.body.scrollTop;
+  function smoothscroll() {
+    const currentScroll =
+      document.documentElement.scrollTop || document.body.scrollTop;
     if (currentScroll > 0) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       window.requestAnimationFrame(smoothscroll);
-      window.scrollTo (0,currentScroll - (currentScroll/25));
+      window.scrollTo(0, currentScroll - currentScroll / 25);
     }
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  function SortODR(e: { preventDefault: () => void; }, item: string) {
+  function SortODR(e: { preventDefault: () => void }, item: string) {
     e.preventDefault();
     dispatch(chooseODR(item));
   }
-  function VueODR (vue: string) {
-    switch(vue) {
+  function VueODR(vue: string) {
+    switch (vue) {
       case 'Overview':
-        return (<Overview film={film} rating={rating}/>);
+        return <Overview film={film} rating={rating} />;
       case 'Details':
-        return (<Details film={film} />);
+        return <Details film={film} />;
       case 'Reviews':
-        return (<Reviews/>);
+        return <Reviews />;
     }
   }
   const vueODR = VueODR(odrItem);
 
+  function FavoriteAdd() {
+    dispatch(fetchFavoriteFilmsAdd(idToken));
+  }
+
+  const myListBtn = (film?.is_favorite === false) ? (
+    <button onClick={FavoriteAdd} className="btn btn--list film-card__button" type="button">
+      <svg viewBox="0 0 19 20" width="19" height="20">
+        <use xlinkHref="#add"></use>
+      </svg>
+      <span>My list</span>
+    </button>
+  ) : (
+    <button className="btn btn--list film-card__button" type="button">
+      <svg viewBox="0 0 18 14" width="18" height="14">
+        <use xlinkHref="#in-list"></use>
+      </svg>
+      <span>My list</span>
+    </button>
+  );
+
   return (
     <>
-      <section style={{background: film?.background_color}} className="film-card film-card--full">
+      <section
+        style={{ background: film?.background_color }}
+        className="film-card film-card--full"
+      >
         <div className="film-card__hero">
           <div className="film-card__bg">
-            <img
-              src={film?.background_image}
-              alt={film?.name}
-            />
+            <img src={film?.background_image} alt={film?.name} />
           </div>
 
           <h1 className="visually-hidden">WTW</h1>
 
           <header className="page-header film-card__head">
             <div className="logo">
-              <Link to='/' className="logo__link">
+              <Link to="/" className="logo__link">
                 <span className="logo__letter logo__letter--1">W</span>
                 <span className="logo__letter logo__letter--2">T</span>
                 <span className="logo__letter logo__letter--3">W</span>
               </Link>
             </div>
-            <UserBlock/>
+            <UserBlock />
           </header>
 
           <div className="film-card__wrap">
@@ -119,7 +145,8 @@ function Film(): JSX.Element {
                   </svg>
                   <span>Play</span>
                 </button>
-                <button
+                {myListBtn}
+                {/* <button
                   className="btn btn--list film-card__button"
                   type="button"
                 >
@@ -127,7 +154,7 @@ function Film(): JSX.Element {
                     <use xlinkHref="#add"></use>
                   </svg>
                   <span>My list</span>
-                </button>
+                </button> */}
                 <a href="add-review.html" className="btn film-card__button">
                   Add review
                 </a>
@@ -150,15 +177,17 @@ function Film(): JSX.Element {
             <div className="film-card__desc">
               <nav className="film-nav film-card__nav">
                 <ul className="film-nav__list">
-                  {odr.map((el) =>
-                    (
-                      <li onClick={(e) => SortODR(e, el)} key={el} className={odrItem === el ? odrClassActive : odrClass}>
-                        <a href="#" className="film-nav__link">
-                          {el}
-                        </a>
-                      </li>
-                    ),
-                  )}
+                  {odr.map((el) => (
+                    <li
+                      onClick={(e) => SortODR(e, el)}
+                      key={el}
+                      className={odrItem === el ? odrClassActive : odrClass}
+                    >
+                      <a href="#" className="film-nav__link">
+                        {el}
+                      </a>
+                    </li>
+                  ))}
                 </ul>
               </nav>
               {vueODR}
@@ -172,15 +201,15 @@ function Film(): JSX.Element {
           <h2 className="catalog__title">More like this</h2>
 
           <div className="catalog__films-list">
-            {similar.map((sim) =>
-              <CardFilm key={sim.id} film={sim}/>,
-            )}
+            {similar.map((sim) => (
+              <CardFilm key={sim.id} film={sim} />
+            ))}
           </div>
         </section>
 
         <footer className="page-footer">
           <div className="logo">
-            <Link to='/'  className="logo__link logo__link--light">
+            <Link to="/" className="logo__link logo__link--light">
               <span className="logo__letter logo__letter--1">W</span>
               <span className="logo__letter logo__letter--2">T</span>
               <span className="logo__letter logo__letter--3">W</span>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/useApps';
+import { favoriteClear, fetchFavoriteFilms } from '../../store/filmSlice';
 import { userDelete } from '../../store/userSlice';
 
 function UserBlock(): JSX.Element  {
@@ -12,13 +13,17 @@ function UserBlock(): JSX.Element  {
 
   const SignOut = () => {
     dispatch(userDelete());
+    dispatch(favoriteClear());
+  };
+  const OpenMyList = () => {
+    dispatch(fetchFavoriteFilms(token));
   };
 
   const userBlock = (token !== undefined) ?
     (
       <ul className="user-block">
         <li className="user-block__item">
-          <div className="user-block__avatar">
+          <div onClick={OpenMyList} className="user-block__avatar">
             <Link to='/mylist'>
               <img
                 src={user.avatar_url}

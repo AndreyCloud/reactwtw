@@ -3,6 +3,7 @@ import { ArrCommentGet, ArrFilms, Film } from '../types/films';
 
 type FilmsState = {
   films: ArrFilms;
+  favoriteFilms: ArrFilms;
   similar: ArrFilms;
   promoFilm: Film;
   commentFilm: ArrCommentGet;
@@ -14,6 +15,7 @@ type FilmsState = {
 
 const initialState: FilmsState = {
   films: [],
+  favoriteFilms: [],
   similar: [],
   promoFilm: {} as Film,
   commentFilm: [],
@@ -23,10 +25,77 @@ const initialState: FilmsState = {
   loading: false,
 };
 
+type IdToken = {
+  id: string,
+  token: string
+}
+
 export const fetchFilms = createAsyncThunk<ArrFilms, unknown, {rejectValue: string}>(
   'films/fetchFilms',
   async (_, {rejectWithValue}) => {
     const respons = await fetch('https://8.react.pages.academy/wtw/films');
+
+    if(!respons.ok) {
+      return rejectWithValue('Server error!');
+    }
+
+    const data = await respons.json();
+    return data;
+  },
+);
+export const fetchFavoriteFilms = createAsyncThunk<ArrFilms, string, {rejectValue: string}>(
+  'films/fetchFavoriteFilms',
+  async (token, {rejectWithValue}) => {
+    const respons: Response = await fetch('https://8.react.pages.academy/wtw/favorite', {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Token': token,
+      },
+    });
+
+    if(!respons.ok) {
+      return rejectWithValue('Server error!');
+    }
+
+    const data = await respons.json();
+    return data;
+  },
+);
+export const fetchFavoriteFilmsAdd = createAsyncThunk<Film, IdToken, {rejectValue: string}>(
+  'films/fetchFavoriteFilmsAdd',
+  async (idToken, {rejectWithValue}) => {
+
+    const {id, token} = idToken;
+
+    const respons = await fetch(`https://8.react.pages.academy/wtw/favorite/${id}/1`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Token': token,
+      },
+    });
+
+    if(!respons.ok) {
+      return rejectWithValue('Server error!');
+    }
+
+    const data = await respons.json();
+    return data;
+  },
+);
+export const fetchFavoriteFilmsDelete = createAsyncThunk<Film, IdToken, {rejectValue: string}>(
+  'films/fetchFavoriteFilmsDelete',
+  async (idToken, {rejectWithValue}) => {
+
+    const {id, token} = idToken;
+
+    const respons = await fetch(`https://8.react.pages.academy/wtw/favorite/${id}/0`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Token': token,
+      },
+    });
 
     if(!respons.ok) {
       return rejectWithValue('Server error!');
@@ -52,7 +121,7 @@ export const fetchFilmPromo = createAsyncThunk<Film, unknown, {rejectValue: stri
 export const fetchSimilar = createAsyncThunk<ArrFilms, string, {rejectValue: string}>(
   'films/fetchSimilar',
   async (id, {rejectWithValue}) => {
-    const respons = await fetch(`https://8.react.pages.academy/wtw/films/${id}/similar`);
+    const respons: Response = await fetch(`https://8.react.pages.academy/wtw/films/${id}/similar`);
 
     if(!respons.ok) {
       return rejectWithValue('Server error!');
@@ -87,6 +156,9 @@ const filmSlice = createSlice({
     sortGenre(state, action) {
       state.sortGenre = action.payload;
     },
+    favoriteClear(state) {
+      state.favoriteFilms = [];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -96,6 +168,18 @@ const filmSlice = createSlice({
       })
       .addCase(fetchFilms.fulfilled, (state, action) => {
         state.films = action.payload;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(fetchFavoriteFilms.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchFavoriteFilms.fulfilled, (state, action) => {
+        state.favoriteFilms = action.payload;
+        state.favoriteFilms.forEach((favorit) => {
+          state.films = state.films.map((elem) => elem.id !== favorit.id ? elem : favorit);
+        });
         state.loading = false;
         state.error = null;
       })
@@ -126,6 +210,14 @@ const filmSlice = createSlice({
         state.loading = false;
         state.error = null;
       })
+      .addCase(fetchFavoriteFilmsAdd.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchFavoriteFilmsAdd.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+      })
 
       .addMatcher(isError, (state, action: PayloadAction<string>) => {
         state.error = action.payload;
@@ -139,6 +231,6 @@ function isError (action: AnyAction) {
   return action.type.endsWith('rejected');
 }
 
-export const {chooseODR, sortGenre} = filmSlice.actions;
+export const {chooseODR, sortGenre, favoriteClear} = filmSlice.actions;
 
 export default filmSlice.reducer;
