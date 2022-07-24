@@ -1,12 +1,13 @@
 import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/useApps';
-import { chooseODR, fetchComment, fetchFavoriteFilmsAdd, fetchSimilar } from '../../store/filmSlice';
+import { chooseODR, fetchComment, fetchSimilar } from '../../store/filmSlice';
 import CardFilm from '../CardFilm/CardFilm';
 import Reviews from './Reviews';
 import Details from './Details';
 import Overview from './Overview';
 import UserBlock from '../UserBlock/UserBlock';
+import MyListBtn from '../MyListBtn/MyListBtn';
 
 function Film(): JSX.Element {
   const odr = ['Overview', 'Details', 'Reviews'];
@@ -16,12 +17,11 @@ function Film(): JSX.Element {
 
   const params = useParams();
   const idFilm = params.id ? params.id : '';
-  const token = useAppSelector((state) => state.user.user.token);
-  const id = idFilm;
-  const idToken = {id, token};
+
 
   const films = useAppSelector((state) => state.film.films);
   const film = films.find((e) => String(e.id) === idFilm);
+
 
   const Rating = (grade: number | undefined) => {
     if (grade === undefined) {
@@ -44,7 +44,6 @@ function Film(): JSX.Element {
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const rating = Rating(film?.rating);
 
   const dispatch = useAppDispatch();
@@ -61,12 +60,12 @@ function Film(): JSX.Element {
     const currentScroll =
       document.documentElement.scrollTop || document.body.scrollTop;
     if (currentScroll > 0) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
       window.requestAnimationFrame(smoothscroll);
       window.scrollTo(0, currentScroll - currentScroll / 25);
     }
   }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   function SortODR(e: { preventDefault: () => void }, item: string) {
     e.preventDefault();
     dispatch(chooseODR(item));
@@ -82,26 +81,6 @@ function Film(): JSX.Element {
     }
   }
   const vueODR = VueODR(odrItem);
-
-  function FavoriteAdd() {
-    dispatch(fetchFavoriteFilmsAdd(idToken));
-  }
-
-  const myListBtn = (film?.is_favorite === false) ? (
-    <button onClick={FavoriteAdd} className="btn btn--list film-card__button" type="button">
-      <svg viewBox="0 0 19 20" width="19" height="20">
-        <use xlinkHref="#add"></use>
-      </svg>
-      <span>My list</span>
-    </button>
-  ) : (
-    <button className="btn btn--list film-card__button" type="button">
-      <svg viewBox="0 0 18 14" width="18" height="14">
-        <use xlinkHref="#in-list"></use>
-      </svg>
-      <span>My list</span>
-    </button>
-  );
 
   return (
     <>
@@ -145,16 +124,7 @@ function Film(): JSX.Element {
                   </svg>
                   <span>Play</span>
                 </button>
-                {myListBtn}
-                {/* <button
-                  className="btn btn--list film-card__button"
-                  type="button"
-                >
-                  <svg viewBox="0 0 19 20" width="19" height="20">
-                    <use xlinkHref="#add"></use>
-                  </svg>
-                  <span>My list</span>
-                </button> */}
+                <MyListBtn film={film} id={idFilm}/>
                 <a href="add-review.html" className="btn film-card__button">
                   Add review
                 </a>

@@ -218,6 +218,14 @@ const filmSlice = createSlice({
         state.loading = false;
         state.error = null;
       })
+      .addCase(fetchFavoriteFilmsDelete.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchFavoriteFilmsDelete.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+      })
 
       .addMatcher(isError, (state, action: PayloadAction<string>) => {
         state.error = action.payload;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/useApps';
-import { favoriteClear, fetchFavoriteFilms } from '../../store/filmSlice';
+import { favoriteClear, fetchFavoriteFilms, fetchFilms } from '../../store/filmSlice';
 import { userDelete } from '../../store/userSlice';
 
 function UserBlock(): JSX.Element  {
@@ -14,6 +14,7 @@ function UserBlock(): JSX.Element  {
   const SignOut = () => {
     dispatch(userDelete());
     dispatch(favoriteClear());
+    dispatch(fetchFilms(''));
   };
   const OpenMyList = () => {
     dispatch(fetchFavoriteFilms(token));

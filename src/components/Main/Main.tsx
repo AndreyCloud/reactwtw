@@ -2,11 +2,14 @@ import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks/useApps';
 import { fetchFavoriteFilms } from '../../store/filmSlice';
 import Catalog from '../Catalog/Catalog';
+import MyListBtn from '../MyListBtn/MyListBtn';
 import UserBlock from '../UserBlock/UserBlock';
 
 export default function Main(): JSX.Element {
 
-  const promoFilm = useAppSelector((state) => state.film.promoFilm);
+  const idFilm = useAppSelector((state) => state.film.promoFilm.id);
+  const films = useAppSelector((state) => state.film.films);
+  const promoFilm = films.find((e) => String(e.id) === String(idFilm));
   const token = useAppSelector((state) => state.user.user.token);
 
   const dispatch = useAppDispatch();
@@ -22,8 +25,8 @@ export default function Main(): JSX.Element {
       <section className="film-card">
         <div className="film-card__bg">
           <img
-            src={promoFilm.background_image}
-            alt={promoFilm.name}
+            src={promoFilm?.background_image}
+            alt={promoFilm?.name}
           />
         </div>
 
@@ -44,7 +47,7 @@ export default function Main(): JSX.Element {
           <div className="film-card__info">
             <div className="film-card__poster">
               <img
-                src={promoFilm.poster_image}
+                src={promoFilm?.poster_image}
                 alt="The Grand Budapest Hotel poster"
                 width="218"
                 height="327"
@@ -52,10 +55,10 @@ export default function Main(): JSX.Element {
             </div>
 
             <div className="film-card__desc">
-              <h2 className="film-card__title">{promoFilm.name}</h2>
+              <h2 className="film-card__title">{promoFilm?.name}</h2>
               <p className="film-card__meta">
-                <span className="film-card__genre">{promoFilm.genre}</span>
-                <span className="film-card__year">{promoFilm.released}</span>
+                <span className="film-card__genre">{promoFilm?.genre}</span>
+                <span className="film-card__year">{promoFilm?.released}</span>
               </p>
 
               <div className="film-card__buttons">
@@ -68,15 +71,7 @@ export default function Main(): JSX.Element {
                   </svg>
                   <span>Play</span>
                 </button>
-                <button
-                  className="btn btn--list film-card__button"
-                  type="button"
-                >
-                  <svg viewBox="0 0 19 20" width="19" height="20">
-                    <use xlinkHref="#add"></use>
-                  </svg>
-                  <span>My list</span>
-                </button>
+                <MyListBtn film={promoFilm} id={String(promoFilm?.id)}/>
               </div>
             </div>
           </div>
