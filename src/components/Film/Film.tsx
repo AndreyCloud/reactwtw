@@ -17,6 +17,7 @@ function Film(): JSX.Element {
 
   const params = useParams();
   const idFilm = params.id ? params.id : '';
+  const pathId = `/player/${idFilm}`;
 
 
   const films = useAppSelector((state) => state.film.films);
@@ -115,15 +116,17 @@ function Film(): JSX.Element {
               </p>
 
               <div className="film-card__buttons">
-                <button
-                  className="btn btn--play film-card__button"
-                  type="button"
-                >
-                  <svg viewBox="0 0 19 19" width="19" height="19">
-                    <use xlinkHref="#play-s"></use>
-                  </svg>
-                  <span>Play</span>
-                </button>
+                <Link to={pathId}>
+                  <button
+                    className="btn btn--play film-card__button"
+                    type="button"
+                  >
+                    <svg viewBox="0 0 19 19" width="19" height="19">
+                      <use xlinkHref="#play-s"></use>
+                    </svg>
+                    <span>Play</span>
+                  </button>
+                </Link>
                 <MyListBtn film={film} id={idFilm}/>
                 <a href="add-review.html" className="btn film-card__button">
                   Add review
