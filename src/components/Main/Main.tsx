@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/useApps';
 import { fetchFavoriteFilms } from '../../store/filmSlice';
 import Catalog from '../Catalog/Catalog';
@@ -11,6 +12,7 @@ export default function Main(): JSX.Element {
   const films = useAppSelector((state) => state.film.films);
   const promoFilm = films.find((e) => String(e.id) === String(idFilm));
   const token = useAppSelector((state) => state.user.user.token);
+  const pathId = `/player/${idFilm}`;
 
   const dispatch = useAppDispatch();
 
@@ -62,15 +64,17 @@ export default function Main(): JSX.Element {
               </p>
 
               <div className="film-card__buttons">
-                <button
-                  className="btn btn--play film-card__button"
-                  type="button"
-                >
-                  <svg viewBox="0 0 19 19" width="19" height="19">
-                    <use xlinkHref="#play-s"></use>
-                  </svg>
-                  <span>Play</span>
-                </button>
+                <Link to={pathId}>
+                  <button
+                    className="btn btn--play film-card__button"
+                    type="button"
+                  >
+                    <svg viewBox="0 0 19 19" width="19" height="19">
+                      <use xlinkHref="#play-s"></use>
+                    </svg>
+                    <span>Play</span>
+                  </button>
+                </Link>
                 <MyListBtn film={promoFilm} id={String(promoFilm?.id)}/>
               </div>
             </div>
