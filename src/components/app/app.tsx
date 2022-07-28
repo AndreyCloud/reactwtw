@@ -6,7 +6,7 @@ import MyList from '../MyList/MyList';
 import NotFound from '../NotFound/NotFound';
 import Player from '../Player/Player';
 import SignIn from '../SignIn/SignIn';
-import { useAppDispatch } from '../../hooks/useApps';
+import { useAppDispatch, useAppSelector } from '../../hooks/useApps';
 import { useEffect } from 'react';
 import { fetchFilmPromo, fetchFilms } from '../../store/filmSlice';
 import { fetchLoginToken } from '../../store/userSlice';
@@ -14,6 +14,7 @@ import { fetchLoginToken } from '../../store/userSlice';
 function App(): JSX.Element {
 
   const tokenLogin = localStorage.getItem('user');
+  const token = useAppSelector((state) => state.user.user.token);
 
   const dispatch = useAppDispatch();
 
@@ -30,7 +31,7 @@ function App(): JSX.Element {
       <Route path="/" element={<Main />} />
       <Route path="/login" element={<SignIn />} />
       <Route path="/mylist" element={<MyList />} />
-      <Route path="/films/:id/review" element={<AddReview />} />
+      <Route path="/films/:id/review" element={token ? <AddReview /> : <SignIn/>} />
       <Route path="/films/:id" element={<Film/>} />
       <Route path="/player/:id" element={<Player/>} />
       <Route path="*" element={<NotFound />} />

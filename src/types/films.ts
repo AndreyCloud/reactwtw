@@ -31,6 +31,16 @@ export type CommentGet = {
   comment: string,
   date: string
 }
+export type CommentPost = {
+  rating: number,
+  comment: string,
+}
+export type CommentPostId = {
+  comment: string,
+  rating: number,
+  id: string,
+  token: string,
+}
 
 export type ArrCommentGet = CommentGet[];
 

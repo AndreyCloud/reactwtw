@@ -23,6 +23,8 @@ function Film(): JSX.Element {
   const films = useAppSelector((state) => state.film.films);
   const film = films.find((e) => String(e.id) === idFilm);
 
+  const token = useAppSelector((state) => state.user.user.token);
+
 
   const Rating = (grade: number | undefined) => {
     if (grade === undefined) {
@@ -52,6 +54,7 @@ function Film(): JSX.Element {
   useEffect(() => {
     dispatch(fetchSimilar(idFilm));
     dispatch(fetchComment(idFilm));
+    dispatch(chooseODR('Overview'));
     smoothscroll();
   }, [idFilm]);
 
@@ -128,9 +131,10 @@ function Film(): JSX.Element {
                   </button>
                 </Link>
                 <MyListBtn film={film} id={idFilm}/>
-                <a href="add-review.html" className="btn film-card__button">
+                {token && (
+                  <Link to={`/films/${idFilm}/review`} className="btn film-card__button">
                   Add review
-                </a>
+                  </Link>)}
               </div>
             </div>
           </div>

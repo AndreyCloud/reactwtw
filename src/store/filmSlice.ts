@@ -1,5 +1,5 @@
 import { AnyAction, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ArrCommentGet, ArrFilms, Film } from '../types/films';
+import { ArrCommentGet, ArrFilms, CommentPostId, Film } from '../types/films';
 
 type FilmsState = {
   films: ArrFilms;
@@ -144,7 +144,29 @@ export const fetchComment = createAsyncThunk<ArrCommentGet, string, {rejectValue
     return data;
   },
 );
+export const fetchAddComment = createAsyncThunk<ArrCommentGet, CommentPostId, {rejectValue: string}>(
+  'films/fetchAddComment',
+  async (commentPostId, {rejectWithValue}) => {
 
+    const {comment, rating, token, id} = commentPostId;
+    const commentPost = {comment, rating};
+
+    const response = await fetch(`https://8.react.pages.academy/wtw/comments/${id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Token': token,
+      },
+      body: JSON.stringify(commentPost),
+    });
+
+    if(!response.ok) {
+      return rejectWithValue('Server Error!');
+    }
+    const data = await response.json() as ArrCommentGet;
+    return data;
+  },
+);
 
 const filmSlice = createSlice({
   name: 'films',
@@ -225,6 +247,15 @@ const filmSlice = createSlice({
       .addCase(fetchFavoriteFilmsDelete.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
+      })
+      .addCase(fetchAddComment.pending, (state) => {
+        state.commentFilm = [];
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAddComment.fulfilled, (state, action) => {
+        state.commentFilm = action.payload;
+        state.loading = false;
       })
 
       .addMatcher(isError, (state, action: PayloadAction<string>) => {
